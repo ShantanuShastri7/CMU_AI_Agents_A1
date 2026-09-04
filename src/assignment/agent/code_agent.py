@@ -51,6 +51,14 @@ class CodeAgent(Agent):
         # TODO(1.4): If any skills are available to the agent, make their
         # descriptions/metadata available to the agent in the prompt.
 
+        self.system_prompt = dict(
+            machine = environment.machine,
+            release = environment.release,
+            system = environment.system,
+            version = environment.version)
+
+        self.task_prompt = self.task
+
     def execute_tool_calls(
         self, tool_calls: list[dict[str, Any]]
     ) -> list[dict[str, str]]:
@@ -60,4 +68,58 @@ class CodeAgent(Agent):
         # one message per call (there may be multiple tool calls in one agent
         # response!). Malformed JSON and unknown tools must become recoverable
         # observations relayed to the agent instead of exceptions.
-        raise NotImplementedError
+
+        tool_responses: list[dict[str, str]] = []
+
+        for call in tool_calls:
+            call_id = call.get("id", "")
+            function_info = call.get("function", {})
+            func_name = function_info.get("name", "")
+            raw_args = function_info.get("arguments", "{}")
+
+            # 1. Safely parse JSON arguments
+            try:
+                args = json.loads(raw_args) if isinstance(raw_args, str) else raw_args
+            except json.JSONDecodeError as exc:
+                tool_responses.append({
+                    "role": "tool",
+                    "tool_call_id": call_id,
+                    "content": f"Error: Malformed JSON arguments: {exc}",
+                })
+                continue
+
+            # 2. Dispatch tool calls to execution targets
+            try:
+                if func_name == "execute":
+                    command = args.get("command", "")
+                    output = self.env.execute(command)
+                    content = format_tool_output(output) if isinstance(output, dict) else str(output)
+
+                elif func_name == "send_message":
+                    message = args.get("message", "")
+                    output = self.env.send_message(message)
+                    content = format_tool_output(output) if isinstance(output, dict) else str(output)
+
+                elif func_name == "invoke_skill":
+                    skill_name = args.get("name", "")
+                    if skill_name in self.skills:
+                        content = self.skills[skill_name]["content"]
+                    else:
+                        content = f"Error: Unknown skill '{skill_name}'."
+
+                else:
+                    content = f"Error: Unknown tool '{func_name}'."
+
+            except Exception as exc:
+                content = f"Error during tool execution: {type(exc).__name__}: {exc}"
+
+            # 3. Construct tool observation message
+            tool_responses.append({
+                "role": "tool",
+                "tool_call_id": call_id,
+                "content": content,
+            })
+
+        return tool_responses
+        
+        

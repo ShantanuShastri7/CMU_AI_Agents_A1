@@ -227,7 +227,12 @@ class Agent:
 
         # You want to be careful about which attributes of the class you modify
         # here as they may also be handled by the subclasses.
-        raise NotImplementedError
+
+        message = dict(system=self.system_prompt, user=self.task_prompt)
+        prompt: list[dict[str, Any]] = []
+        prompt.append(message)
+
+        return prompt
 
     def estimate_active_prompt_tokens(self) -> int:
         """Estimate the next prompt, calibrated by the provider's latest usage."""
@@ -326,6 +331,21 @@ class Agent:
             # by setting `Agent.finished`. If the agent exceeds the
             # `step_limit`, raise `StepLimitError`.
 
+            while not self.finished:
+                if self.steps_taken >= self.step_limit:
+                    raise StepLimitError(f"Agent exausted step limit budget of {self.step_limit} steps")
+
+                self.maybe_compact_context()
+
+                message = self.query_language_model()
+
+                tool_calls = message.get("tool_calls")
+
+                if tool_calls:
+                    self.execute_tool_calls(tool_calls=tool_calls)
+                else:
+                    self.finished=True
+
             # TODO(2.2) Call `maybe_compact_context()` before each new action
             # request in your shared loop. It already estimates active tokens
             # and handles the threshold, and tracks compaction events for
@@ -360,4 +380,4 @@ class Agent:
 
         # You do not need to implement anything here. This method is
         # domain-specific and implemented by the relevant subclasses
-        raise NotImplementedError
+        
