@@ -61,7 +61,8 @@ class CodeAgent(Agent):
             f'  "machine": "{environment.machine}",\n'
             f'  "release": "{environment.release}",\n'
             f'  "system": "{environment.system}",\n'
-            f'  "version": "{environment.version}"\n'
+            f'  "version": "{environment.version}",\n'
+            f'  "cwd": "{environment.cwd}"\n'
             "}\n"
             "</system_information>"
         )
@@ -108,7 +109,11 @@ class CodeAgent(Agent):
             try:
                 if func_name == "execute":
                     command = args.get("command", "")
-                    output = self.env.execute(command)
+                    kwargs = {}
+                    for k in ["timeout", "cwd", "env", "shell"]:
+                        if k in args:
+                            kwargs[k] = args[k]
+                    output = self.env.execute(command, **kwargs)
                     content = format_tool_output(output) if isinstance(output, dict) else str(output)
 
                 elif func_name == "send_message":

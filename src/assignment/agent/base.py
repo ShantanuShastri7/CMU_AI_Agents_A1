@@ -231,7 +231,7 @@ class Agent:
                 "content": content,
             }
 
-            return skills
+        return skills
             
 
     def query_language_model(self) -> dict[str, Any]:
