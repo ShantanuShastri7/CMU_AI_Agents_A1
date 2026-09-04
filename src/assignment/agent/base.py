@@ -416,8 +416,6 @@ class Agent:
                 if tool_calls:
                     tool_messages = self.execute_tool_calls(tool_calls)
                     self.messages.extend(deepcopy(tool_messages))
-                else:
-                    self.finished = True
 
             # TODO(2.2) Call `maybe_compact_context()` before each new action
             # request in your shared loop. It already estimates active tokens

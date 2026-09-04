@@ -112,9 +112,17 @@ class CodeAgent(Agent):
                     content = format_tool_output(output) if isinstance(output, dict) else str(output)
 
                 elif func_name == "send_message":
-                    message = args.get("message", "")
-                    output = self.env.send_message(message)
-                    content = format_tool_output(output) if isinstance(output, dict) else str(output)
+                    message = args.get("summary", "")
+                    patch_check = self.env.execute("test -s patch.txt")
+                    if patch_check.get("returncode") != 0:
+                        content = (
+                            "Error: patch.txt is missing or empty. Invoke the "
+                            "submit-task skill, create and verify patch.txt, then "
+                            "call send_message again."
+                        )
+                    else:
+                        self.finished = True
+                        content = message
 
                 elif func_name == "invoke_skill":
                     skill_name = args.get("name", "")
