@@ -169,9 +169,10 @@ class Agent:
         # ``ValueError``.
 
         # 1. Validate skills_path exists and is a directory
-        if not skills_path.exists():
+        path = Path(skills_path)
+        if not path.exists():
             raise ValueError(f"Skills path does not exist: {skills_path}")
-        if not skills_path.is_dir():
+        if not path.is_dir():
             raise ValueError(f"Skills path is not a directory: {skills_path}")
 
         skills: dict[str, dict[str, str]] = {}
@@ -409,20 +410,19 @@ class Agent:
                 self.maybe_compact_context()
 
                 message = self.query_language_model()
+                self.messages.append(deepcopy(message))
 
-                tool_calls = message.get("tool_calls")
-
+                tool_calls = message.get("tool_calls", [])
                 if tool_calls:
-                    self.execute_tool_calls(tool_calls=tool_calls)
+                    tool_messages = self.execute_tool_calls(tool_calls)
+                    self.messages.extend(deepcopy(tool_messages))
                 else:
-                    self.finished=True
+                    self.finished = True
 
             # TODO(2.2) Call `maybe_compact_context()` before each new action
             # request in your shared loop. It already estimates active tokens
             # and handles the threshold, and tracks compaction events for
             # logging.
-
-            raise NotImplementedError
         finally:
             # This block is provided infrastructure. Do not modify it: a
             # trajectory is required even when a run fails.

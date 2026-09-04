@@ -9,6 +9,7 @@ from assignment.agent.base import (
     DEFAULT_COMPACTION_KEEP_RECENT_STEPS,
     DEFAULT_COMPACTION_MAX_TOKENS,
     Agent,
+    format_tool_output,
 )
 from assignment.agent.tools import EXECUTE_TOOL, SEND_MESSAGE_TOOL
 from assignment.env import Environment
@@ -45,17 +46,32 @@ class CodeAgent(Agent):
 
         # TODO(Part 1.3): Make the `execute` and `send_message` tools available
         # to the agent.
+        self.tools.extend([EXECUTE_TOOL, SEND_MESSAGE_TOOL])
 
         # TODO(1.1.b): Construct the system prompt and task_prompt. These
         # should be usable by the `Agent.build_prompt` method.
         # TODO(1.4): If any skills are available to the agent, make their
         # descriptions/metadata available to the agent in the prompt.
 
-        self.system_prompt = dict(
-            machine = environment.machine,
-            release = environment.release,
-            system = environment.system,
-            version = environment.version)
+        self.system_prompt = (
+            "You are a coding agent. Inspect the repository, reproduce the issue, "
+            "make the required fix, and verify it with tests.\n\n"
+            "<system_information>\n"
+            f"{{\n"
+            f'  "machine": "{environment.machine}",\n'
+            f'  "release": "{environment.release}",\n'
+            f'  "system": "{environment.system}",\n'
+            f'  "version": "{environment.version}"\n'
+            "}\n"
+            "</system_information>"
+        )
+        if self.skills:
+            catalog = "\n".join(skill["metadata"] for skill in self.skills.values())
+            self.system_prompt += (
+                "\n\nAvailable skills:\n"
+                f"{catalog}\n"
+                "Invoke a skill before following its workflow."
+            )
 
         self.task_prompt = self.task
 
