@@ -64,7 +64,9 @@ class CodeAgent(Agent):
             f'  "version": "{environment.version}",\n'
             f'  "cwd": "{environment.cwd}"\n'
             "}\n"
-            "</system_information>"
+            "</system_information>\n\n"
+            "You must always use a tool in your response to make progress or communicate. "
+            "Do not respond with only text."
         )
         if self.skills:
             catalog = "\n".join(skill["metadata"] for skill in self.skills.values())
