@@ -11,11 +11,13 @@ import json
 import logging
 import math
 import os
+from os import path
 from pathlib import Path
 from typing import Any
 
 from dotenv import load_dotenv
 from openai import OpenAI
+import yaml
 
 from assignment.env import Environment
 from assignment.agent.tools import INVOKE_SKILL_TOOL
@@ -137,6 +139,7 @@ class Agent:
 
         self.api_prompts: list[list[dict[str, Any]]] = []
         self.api_responses: list[dict[str, Any]] = []
+        self.messages: list[dict[str, Any]] = []
         self.compaction_events: list[dict[str, Any]] = []
         self.tools: list[dict[str, Any]] = []
         self.finished = False
@@ -164,7 +167,71 @@ class Agent:
         # ``content`` of the skill file for ``invoke_skill``. Reject duplicate
         # names and malformed or missing frontmatter with a clear
         # ``ValueError``.
-        raise NotImplementedError
+
+        # 1. Validate skills_path exists and is a directory
+        if not skills_path.exists():
+            raise ValueError(f"Skills path does not exist: {skills_path}")
+        if not skills_path.is_dir():
+            raise ValueError(f"Skills path is not a directory: {skills_path}")
+
+        skills: dict[str, dict[str, str]] = {}
+
+        # 2. Discover one SKILL.md per child directory
+        for skill_file in sorted(skills_path.glob("*/SKILL.md")):
+            content = skill_file.read_text(encoding="utf-8")
+
+            # 3. Check for YAML frontmatter presence at head of file
+            if not content.startswith("---"):
+                raise ValueError(
+                    f"Missing YAML frontmatter opening '---' in {skill_file}"
+                )
+
+            parts = content.split("---", 2)
+            if len(parts) < 3:
+                raise ValueError(
+                    f"Malformed YAML frontmatter in {skill_file}: missing closing '---'"
+                )
+
+            frontmatter_str = parts[1]
+
+            # 4. Parse YAML frontmatter
+            try:
+                frontmatter = yaml.safe_load(frontmatter_str)
+            except yaml.YAMLError as exc:
+                raise ValueError(
+                    f"Failed to parse YAML frontmatter in {skill_file}: {exc}"
+                ) from exc
+
+            if not isinstance(frontmatter, dict):
+                raise ValueError(
+                    f"Frontmatter in {skill_file} must parse to a dictionary mapping."
+                )
+
+            name = frontmatter.get("name")
+            if not name or not isinstance(name, str):
+                raise ValueError(
+                    f"Frontmatter in {skill_file} is missing a valid 'name' field."
+                )
+
+            name = name.strip()
+
+            # 5. Reject duplicate names
+            if name in skills:
+                raise ValueError(
+                    f"Duplicate skill name '{name}' found in {skill_file}."
+                )
+
+            # 6. Build concise metadata catalog entry and record full content
+            description = str(frontmatter.get("description", "")).strip()
+            metadata = f"{name}: {description}" if description else name
+
+            skills[name] = {
+                "metadata": metadata,
+                "content": content,
+            }
+
+            return skills
+            
 
     def query_language_model(self) -> dict[str, Any]:
         """Send one tool-enabled Chat Completions request and normalize it."""
@@ -228,9 +295,13 @@ class Agent:
         # You want to be careful about which attributes of the class you modify
         # here as they may also be handled by the subclasses.
 
-        message = dict(system=self.system_prompt, user=self.task_prompt)
-        prompt: list[dict[str, Any]] = []
-        prompt.append(message)
+        prompt: list[dict[str, Any]] = [
+        {"role": "system", "content": self.system_prompt},
+        {"role": "user", "content": self.task_prompt},
+    ]
+
+        # 2. Append prior interactions (assistant turns and tool observations)
+        prompt.extend(self.messages)
 
         return prompt
 
