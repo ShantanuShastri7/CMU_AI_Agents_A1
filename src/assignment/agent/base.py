@@ -32,7 +32,47 @@ MAX_OBSERVATION_CHARS = 10_000
 # TODO(Part 2): Write instructions that make the model produce concise working
 # memory for a software agent. The prompt should preserve concrete progress,
 # failures, test results, constraints, and next steps without copying raw output.
-COMPACTION_SYSTEM_PROMPT = ""
+COMPACTION_SYSTEM_PROMPT = """You are an expert technical archivist.
+
+Your task is to compress the complete agent session history into a single, structured working-memory summary.
+
+The summary must enable a future agent to resume work immediately without reading the raw history.
+
+Use the following schema strictly:
+
+1. CURRENT_TASK
+   [One sentence stating the high-level objective (e.g., "Fix memory leak in chess engine").]
+
+2. RECENT_PROGRESS
+   [Bulleted list of key actions taken and verified outcomes in the last N steps (default: last 5 steps).
+   Focus on factual changes: code modifications, API calls made, and their results. Omit raw logs.]
+
+3. CRITICAL_FINDINGS
+   - Key decisions made and why.
+   - Verified facts (e.g., "File X has Y structure", "Function Z returns error on input A").
+   - Successful workarounds discovered.
+
+4. FAILED_ATTEMPTS (Do Not Repeat)
+   - List approaches that failed and the specific reason.
+   - Explicitly state what *not* to try again.
+
+5. CURRENT_STATE
+   - Current file paths and code locations.
+   - Active error messages (exact top-level error only).
+   - Passing test cases.
+   - Known bugs or open issues.
+
+6. NEXT_ACTIONABLE_STEPS
+   [Numbered list of concrete technical tasks to attempt next.]
+
+CONSTRAINTS:
+- Use declarative sentences only.
+- Keep the total length under 300 words.
+- Do not include greetings, apologies, or meta-commentary.
+- Prioritize information that changes the state of the system or understanding of the problem.
+- Discard redundant details, verbose explanations, and conversational filler.
+
+Generate the summary now based on the history above."""
 
 
 class StepLimitError(Exception):
@@ -342,9 +382,32 @@ class Agent:
         # with all linked tool observations. The resulting summary should change
         # what `build_prompt` emits, and reduce the length of the prompt.
 
-        raise NotImplementedError
+        # 1. Find indices of all assistant steps in the message history
+        assistant_indices = [
+            i for i, msg in enumerate(self.messages) if msg.get("role") == "assistant"
+        ]
 
-        compaction_prompt = []
+        # 2. Determine split point to retain the latest N recent steps
+        if len(assistant_indices) >= self.compaction_keep_recent_steps:
+            split_idx = assistant_indices[-self.compaction_keep_recent_steps]
+        else:
+            split_idx = 0
+
+        old_messages = self.messages[:split_idx]
+        recent_messages = self.messages[split_idx:]
+
+        # 3. Build compaction request prompt
+        history_text = json.dumps(old_messages, indent=2, ensure_ascii=False)
+        compaction_prompt = [
+            {"role": "system", "content": COMPACTION_SYSTEM_PROMPT},
+            {
+                "role": "user",
+                "content": (
+                    f"Task Statement:\n{self.task_prompt}\n\n"
+                    f"Prior Session History to Summarize:\n{history_text}"
+                ),
+            },
+        ]
 
         ### Do not modify this section ###
         compaction_response = self.client.chat.completions.create(
