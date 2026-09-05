@@ -417,6 +417,11 @@ class Agent:
             max_completion_tokens=self.compaction_max_tokens,
         )
 
+        summary_text = compaction_response.choices[0].message.content
+        self.messages = [
+            {"role": "user", "content": f"Prior context summary:\n{summary_text}"}
+        ] + recent_messages
+
         return compaction_prompt, compaction_response.model_dump(mode="json")
         ##################################
 
