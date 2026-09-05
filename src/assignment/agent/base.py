@@ -35,6 +35,7 @@ MAX_OBSERVATION_CHARS = 10_000
 COMPACTION_SYSTEM_PROMPT = """You are an expert technical archivist.
 
 Your task is to compress the complete agent session history into a single, structured working-memory summary.
+The history may already contain a previous summary. If so, integrate it with the new events to form a single, updated summary. Do not output meta-commentary or analyze the prompt itself; just output the summary.
 
 The summary must enable a future agent to resume work immediately without reading the raw history.
 
@@ -397,7 +398,16 @@ class Agent:
         recent_messages = self.messages[split_idx:]
 
         # 3. Build compaction request prompt
-        history_text = json.dumps(old_messages, indent=2, ensure_ascii=False)
+        history_lines = []
+        for msg in old_messages:
+            role = msg.get("role", "unknown").upper()
+            content = msg.get("content", "")
+            history_lines.append(f"{role}:\n{content}")
+            if "tool_calls" in msg:
+                history_lines.append(f"TOOL CALLS: {json.dumps(msg['tool_calls'], indent=2)}")
+            history_lines.append("-" * 40)
+        history_text = "\n".join(history_lines)
+        
         compaction_prompt = [
             {"role": "system", "content": COMPACTION_SYSTEM_PROMPT},
             {
