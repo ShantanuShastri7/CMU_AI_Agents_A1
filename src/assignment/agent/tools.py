@@ -133,7 +133,25 @@ INVOKE_SKILL_TOOL = {
 # TODO(3.1.a): Define an OpenAI function-tool schema named ``play_move``.
 # It must accept exactly one required string argument named ``move``, explain
 # that moves use UCI notation (for example e2e4), and reject extra arguments.
-PLAY_MOVE_TOOL: dict = {}
+PLAY_MOVE_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "play_move",
+        "description": "Play a move in the active game using standard Universal Chess Interface (UCI) notation.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "move": {
+                    "type": "string",
+                    "description": "The move to play in UCI notation (for example 'e2e4' or 'e7e8q').",
+                }
+            },
+            "required": ["move"],
+            "additionalProperties": False,
+        },
+        "strict": True,
+    },
+}
 
 # TODO(3.3): Define the `simulate_move` tool, like the `play_move` tool.
 SIMULATE_MOVE_TOOL: dict = {}

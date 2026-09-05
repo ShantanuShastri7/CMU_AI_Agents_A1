@@ -107,6 +107,7 @@ class ChessAgent(Agent):
         )
 
         # TODO(Part 3): Register the play_move tool schema from tools.py.
+        self.tools = [PLAY_MOVE_TOOL]
 
         if programmatic_tools:
             self.tools.append(RUN_PYTHON_TOOL)
@@ -175,6 +176,34 @@ class ChessAgent(Agent):
         # 5. Turn malformed, unknown, rejected, or extra parallel calls into
         #    recoverable <chess_error> observations instead of crashing.
 
+        results = []
+        for tool_call in tool_calls:
+            if tool_call["function"]["name"] == "play_move":
+                move = tool_call["function"]["arguments"]
+                try:
+                    response_str = _play_move(self.chess_client, move)
+                    if response_str.startswith("<chess_error>"):
+                        results.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call["id"],
+                            "content": response_str,
+                        })
+                    else:
+                        new_state = json.loads(response_str)
+                        self.last_state = new_state
+                        self.finished = bool(new_state.get("game_over"))
+                        results.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call["id"],
+                            "content": self.format_state(new_state),
+                        })
+                except Exception as e:
+                    results.append({
+                        "role": "tool",
+                        "tool_call_id": tool_call["id"],
+                        "content": f"<chess_error>{e}</chess_error>",
+                    })
+
         # TODO(Part 3.3-4): add cases for simulate_move and run_python, with
         # linked observations and recoverable errors, just like the old tool.
-        raise NotImplementedError
+        return results

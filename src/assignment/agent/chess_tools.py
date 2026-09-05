@@ -67,7 +67,39 @@ def _play_move(client: httpx.Client, arguments: str) -> str:
     # for the agent to address. Cover malformed JSON arguments, arguments
     # that are not an object, a missing or non-string fen, a non-string move,
     # a position or move the server rejects, and a transport failure.
-    raise NotImplementedError
+    try:
+        try:
+            parsed = json.loads(arguments)
+        except ValueError as exc:
+            return f"<chess_error>Invalid JSON in arguments: {exc}</chess_error>"
+
+        if not isinstance(parsed, dict):
+            return "<chess_error>Arguments must be a JSON object.</chess_error>"
+        move = parsed.get("move")
+        if not isinstance(move, str):
+            return "<chess_error>Missing or invalid move argument.</chess_error>"
+
+        # Get FEN from current state
+        state_resp = _request_state(client, "GET", "/api/state")
+        fen = state_resp.get("fen")
+        if not isinstance(fen, str):
+            return "<chess_error>Could not retrieve current game state or FEN.</chess_error>"
+
+        # Call the server's play endpoint
+        body = {"move": move}
+        resp = _request_state(client, "POST", "/api/move", json=body)
+
+        return json.dumps(resp)
+
+    except ValueError as exc:
+        # Server-side validation error
+        return f"<chess_error>{str(exc)}</chess_error>"
+    except httpx.RequestException as exc:
+        # Transport failure
+        return f"<chess_error>Chess server transport error: {exc}</chess_error>"
+    except RuntimeError as exc:
+        # Catch unexpected runtime errors
+        return f"<chess_error>Runtime error in play_move: {exc}</chess_error>"
 
 
 def _run_python(env: Any, port: int, arguments: str) -> str:
