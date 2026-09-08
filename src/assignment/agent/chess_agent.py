@@ -107,7 +107,7 @@ class ChessAgent(Agent):
         )
 
         # TODO(Part 3): Register the play_move tool schema from tools.py.
-        self.tools = [PLAY_MOVE_TOOL]
+        self.tools = [PLAY_MOVE_TOOL, SIMULATE_MOVE_TOOL]
 
         if programmatic_tools:
             self.tools.append(RUN_PYTHON_TOOL)
@@ -197,6 +197,21 @@ class ChessAgent(Agent):
                             "tool_call_id": tool_call["id"],
                             "content": self.format_state(new_state),
                         })
+                except Exception as e:
+                    results.append({
+                        "role": "tool",
+                        "tool_call_id": tool_call["id"],
+                        "content": f"<chess_error>{e}</chess_error>",
+                    })
+            elif tool_call["function"]["name"] == "simulate_move":
+                args = tool_call["function"]["arguments"]
+                try:
+                    response_str = _simulate_move(self.chess_client, args)
+                    results.append({
+                        "role": "tool",
+                        "tool_call_id": tool_call["id"],
+                        "content": response_str,
+                    })
                 except Exception as e:
                     results.append({
                         "role": "tool",

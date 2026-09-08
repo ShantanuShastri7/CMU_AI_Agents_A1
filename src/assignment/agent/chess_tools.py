@@ -45,14 +45,35 @@ def _simulate_move(client: httpx.Client, arguments: str) -> str:
     to send back, so a bad argument or a server error reaches the model as a
     recoverable ``<chess_error>`` instead of ending the run.
     """
-    # TODO(Part 3.3.b): Parse the arguments, call the provided
-    # /api/simulate endpoint with fen and optional move, and return its JSON.
-    # Catch any errors raised by the tool and return an error message between
-    # `<chess_error></chess_error>` for the agent to address. Cover malformed
-    # JSON arguments, arguments that are not an object, a missing or
-    # non-string fen, a non-string move, a position or move the server rejects,
-    # and a transport failure.
-    raise NotImplementedError
+    try:
+        try:
+            parsed = json.loads(arguments)
+        except ValueError as exc:
+            return f"<chess_error>Invalid JSON in arguments: {exc}</chess_error>"
+
+        if not isinstance(parsed, dict):
+            return "<chess_error>Arguments must be a JSON object.</chess_error>"
+
+        fen = parsed.get("fen")
+        if not isinstance(fen, str):
+            return "<chess_error>Missing or invalid fen argument.</chess_error>"
+
+        body = {"fen": fen}
+        move = parsed.get("move")
+        if move is not None:
+            if not isinstance(move, str):
+                return "<chess_error>Invalid move argument: must be a string if provided.</chess_error>"
+            body["move"] = move
+
+        resp = _request_state(client, "POST", "/api/simulate", json=body)
+        return json.dumps(resp)
+
+    except ValueError as exc:
+        return f"<chess_error>{str(exc)}</chess_error>"
+    except httpx.RequestError as exc:
+        return f"<chess_error>Chess server transport error: {exc}</chess_error>"
+    except RuntimeError as exc:
+        return f"<chess_error>Runtime error in simulate_move: {exc}</chess_error>"
 
 
 def _play_move(client: httpx.Client, arguments: str) -> str:
@@ -94,7 +115,7 @@ def _play_move(client: httpx.Client, arguments: str) -> str:
     except ValueError as exc:
         # Server-side validation error
         return f"<chess_error>{str(exc)}</chess_error>"
-    except httpx.RequestException as exc:
+    except httpx.RequestError as exc:
         # Transport failure
         return f"<chess_error>Chess server transport error: {exc}</chess_error>"
     except RuntimeError as exc:

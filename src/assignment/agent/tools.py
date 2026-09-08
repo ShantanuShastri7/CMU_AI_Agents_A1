@@ -154,7 +154,29 @@ PLAY_MOVE_TOOL = {
 }
 
 # TODO(3.3): Define the `simulate_move` tool, like the `play_move` tool.
-SIMULATE_MOVE_TOOL: dict = {}
+SIMULATE_MOVE_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "simulate_move",
+        "description": "Simulate a move to get the resulting position, or just get the legal moves for a FEN.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "fen": {
+                    "type": "string",
+                    "description": "The current game state in FEN notation.",
+                },
+                "move": {
+                    "type": ["string", "null"],
+                    "description": "Optional UCI move to simulate.",
+                }
+            },
+            "required": ["fen"],
+            "additionalProperties": False,
+        },
+        "strict": True,
+    },
+}
 
 # TODO()
 RUN_PYTHON_TOOL: dict = {}
