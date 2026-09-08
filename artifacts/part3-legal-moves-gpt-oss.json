@@ -1,0 +1,500 @@
+{
+  "prompts": [
+    [
+      {
+        "role": "system",
+        "content": "You are playing White in a chess game against a deterministic Black bot.\n\nUse the `play_move` tool for every move. Pass exactly one UCI move listed in the\nlatest `legal_moves` field, then inspect the returned board before choosing the\nnext move. Uppercase pieces are White; lowercase pieces are Black; `.` is an\nempty square. The server applies Black's reply automatically, so never submit a\nmove for Black and never assume what Black played. Promotion moves include a\npiece suffix, for example `e7e8q`.\n\nContinue until the returned state says `game_over: true`. While the game is\nactive, make a tool call instead of merely describing a move in text."
+      },
+      {
+        "role": "user",
+        "content": "Play this game as White. Choose one move from legal_moves and call play_move.\n\n<chess_state>\nstatus: Your turn\nturn: white\nin_check: False\ngame_over: False\nfen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\nhuman_move: (none)\nengine_move: (none)\nboard:\n    a b c d e f g h\n8 | r n b q k b n r | 8\n7 | p p p p p p p p | 7\n6 | . . . . . . . . | 6\n5 | . . . . . . . . | 5\n4 | . . . . . . . . | 4\n3 | . . . . . . . . | 3\n2 | P P P P P P P P | 2\n1 | R N B Q K B N R | 1\n    a b c d e f g h\nrecent_history: (none)\nlegal_moves: a2a3 a2a4 b1a3 b1c3 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 f2f3 f2f4 g1f3 g1h3 g2g3 g2g4 h2h3 h2h4\n</chess_state>"
+      }
+    ],
+    [
+      {
+        "role": "system",
+        "content": "You are playing White in a chess game against a deterministic Black bot.\n\nUse the `play_move` tool for every move. Pass exactly one UCI move listed in the\nlatest `legal_moves` field, then inspect the returned board before choosing the\nnext move. Uppercase pieces are White; lowercase pieces are Black; `.` is an\nempty square. The server applies Black's reply automatically, so never submit a\nmove for Black and never assume what Black played. Promotion moves include a\npiece suffix, for example `e7e8q`.\n\nContinue until the returned state says `game_over: true`. While the game is\nactive, make a tool call instead of merely describing a move in text."
+      },
+      {
+        "role": "user",
+        "content": "Play this game as White. Choose one move from legal_moves and call play_move.\n\n<chess_state>\nstatus: Your turn\nturn: white\nin_check: False\ngame_over: False\nfen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\nhuman_move: (none)\nengine_move: (none)\nboard:\n    a b c d e f g h\n8 | r n b q k b n r | 8\n7 | p p p p p p p p | 7\n6 | . . . . . . . . | 6\n5 | . . . . . . . . | 5\n4 | . . . . . . . . | 4\n3 | . . . . . . . . | 3\n2 | P P P P P P P P | 2\n1 | R N B Q K B N R | 1\n    a b c d e f g h\nrecent_history: (none)\nlegal_moves: a2a3 a2a4 b1a3 b1c3 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 f2f3 f2f4 g1f3 g1h3 g2g3 g2g4 h2h3 h2h4\n</chess_state>"
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to choose a move from legal_moves and call play_move. It's initial position, typical opening move. Any move is fine. Choose e2e4 (king pawn two squares). That's a standard opening.\n\nWe will call play_move with move \"e2e4\"."
+      }
+    ],
+    [
+      {
+        "role": "system",
+        "content": "You are playing White in a chess game against a deterministic Black bot.\n\nUse the `play_move` tool for every move. Pass exactly one UCI move listed in the\nlatest `legal_moves` field, then inspect the returned board before choosing the\nnext move. Uppercase pieces are White; lowercase pieces are Black; `.` is an\nempty square. The server applies Black's reply automatically, so never submit a\nmove for Black and never assume what Black played. Promotion moves include a\npiece suffix, for example `e7e8q`.\n\nContinue until the returned state says `game_over: true`. While the game is\nactive, make a tool call instead of merely describing a move in text."
+      },
+      {
+        "role": "user",
+        "content": "Play this game as White. Choose one move from legal_moves and call play_move.\n\n<chess_state>\nstatus: Your turn\nturn: white\nin_check: False\ngame_over: False\nfen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\nhuman_move: (none)\nengine_move: (none)\nboard:\n    a b c d e f g h\n8 | r n b q k b n r | 8\n7 | p p p p p p p p | 7\n6 | . . . . . . . . | 6\n5 | . . . . . . . . | 5\n4 | . . . . . . . . | 4\n3 | . . . . . . . . | 3\n2 | P P P P P P P P | 2\n1 | R N B Q K B N R | 1\n    a b c d e f g h\nrecent_history: (none)\nlegal_moves: a2a3 a2a4 b1a3 b1c3 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 f2f3 f2f4 g1f3 g1h3 g2g3 g2g4 h2h3 h2h4\n</chess_state>"
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to choose a move from legal_moves and call play_move. It's initial position, typical opening move. Any move is fine. Choose e2e4 (king pawn two squares). That's a standard opening.\n\nWe will call play_move with move \"e2e4\"."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to pick a legal move. It's initial position. Choose a standard opening move. Any from list. Let's play e2e4."
+      }
+    ],
+    [
+      {
+        "role": "system",
+        "content": "You are playing White in a chess game against a deterministic Black bot.\n\nUse the `play_move` tool for every move. Pass exactly one UCI move listed in the\nlatest `legal_moves` field, then inspect the returned board before choosing the\nnext move. Uppercase pieces are White; lowercase pieces are Black; `.` is an\nempty square. The server applies Black's reply automatically, so never submit a\nmove for Black and never assume what Black played. Promotion moves include a\npiece suffix, for example `e7e8q`.\n\nContinue until the returned state says `game_over: true`. While the game is\nactive, make a tool call instead of merely describing a move in text."
+      },
+      {
+        "role": "user",
+        "content": "Play this game as White. Choose one move from legal_moves and call play_move.\n\n<chess_state>\nstatus: Your turn\nturn: white\nin_check: False\ngame_over: False\nfen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\nhuman_move: (none)\nengine_move: (none)\nboard:\n    a b c d e f g h\n8 | r n b q k b n r | 8\n7 | p p p p p p p p | 7\n6 | . . . . . . . . | 6\n5 | . . . . . . . . | 5\n4 | . . . . . . . . | 4\n3 | . . . . . . . . | 3\n2 | P P P P P P P P | 2\n1 | R N B Q K B N R | 1\n    a b c d e f g h\nrecent_history: (none)\nlegal_moves: a2a3 a2a4 b1a3 b1c3 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 f2f3 f2f4 g1f3 g1h3 g2g3 g2g4 h2h3 h2h4\n</chess_state>"
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to choose a move from legal_moves and call play_move. It's initial position, typical opening move. Any move is fine. Choose e2e4 (king pawn two squares). That's a standard opening.\n\nWe will call play_move with move \"e2e4\"."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to pick a legal move. It's initial position. Choose a standard opening move. Any from list. Let's play e2e4."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to play a move as White from starting position. Choose any legal move. Let's pick e2e4 (common). Need to call play_move tool with move \"e2e4\"."
+      }
+    ],
+    [
+      {
+        "role": "system",
+        "content": "You are playing White in a chess game against a deterministic Black bot.\n\nUse the `play_move` tool for every move. Pass exactly one UCI move listed in the\nlatest `legal_moves` field, then inspect the returned board before choosing the\nnext move. Uppercase pieces are White; lowercase pieces are Black; `.` is an\nempty square. The server applies Black's reply automatically, so never submit a\nmove for Black and never assume what Black played. Promotion moves include a\npiece suffix, for example `e7e8q`.\n\nContinue until the returned state says `game_over: true`. While the game is\nactive, make a tool call instead of merely describing a move in text."
+      },
+      {
+        "role": "user",
+        "content": "Play this game as White. Choose one move from legal_moves and call play_move.\n\n<chess_state>\nstatus: Your turn\nturn: white\nin_check: False\ngame_over: False\nfen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\nhuman_move: (none)\nengine_move: (none)\nboard:\n    a b c d e f g h\n8 | r n b q k b n r | 8\n7 | p p p p p p p p | 7\n6 | . . . . . . . . | 6\n5 | . . . . . . . . | 5\n4 | . . . . . . . . | 4\n3 | . . . . . . . . | 3\n2 | P P P P P P P P | 2\n1 | R N B Q K B N R | 1\n    a b c d e f g h\nrecent_history: (none)\nlegal_moves: a2a3 a2a4 b1a3 b1c3 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 f2f3 f2f4 g1f3 g1h3 g2g3 g2g4 h2h3 h2h4\n</chess_state>"
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to choose a move from legal_moves and call play_move. It's initial position, typical opening move. Any move is fine. Choose e2e4 (king pawn two squares). That's a standard opening.\n\nWe will call play_move with move \"e2e4\"."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to pick a legal move. It's initial position. Choose a standard opening move. Any from list. Let's play e2e4."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to play a move as White from starting position. Choose any legal move. Let's pick e2e4 (common). Need to call play_move tool with move \"e2e4\"."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to make a move as White from initial position. Choose any legal move. Probably a central pawn e2e4 is good. Need to call play_move tool."
+      }
+    ],
+    [
+      {
+        "role": "system",
+        "content": "You are playing White in a chess game against a deterministic Black bot.\n\nUse the `play_move` tool for every move. Pass exactly one UCI move listed in the\nlatest `legal_moves` field, then inspect the returned board before choosing the\nnext move. Uppercase pieces are White; lowercase pieces are Black; `.` is an\nempty square. The server applies Black's reply automatically, so never submit a\nmove for Black and never assume what Black played. Promotion moves include a\npiece suffix, for example `e7e8q`.\n\nContinue until the returned state says `game_over: true`. While the game is\nactive, make a tool call instead of merely describing a move in text."
+      },
+      {
+        "role": "user",
+        "content": "Play this game as White. Choose one move from legal_moves and call play_move.\n\n<chess_state>\nstatus: Your turn\nturn: white\nin_check: False\ngame_over: False\nfen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\nhuman_move: (none)\nengine_move: (none)\nboard:\n    a b c d e f g h\n8 | r n b q k b n r | 8\n7 | p p p p p p p p | 7\n6 | . . . . . . . . | 6\n5 | . . . . . . . . | 5\n4 | . . . . . . . . | 4\n3 | . . . . . . . . | 3\n2 | P P P P P P P P | 2\n1 | R N B Q K B N R | 1\n    a b c d e f g h\nrecent_history: (none)\nlegal_moves: a2a3 a2a4 b1a3 b1c3 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 f2f3 f2f4 g1f3 g1h3 g2g3 g2g4 h2h3 h2h4\n</chess_state>"
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to choose a move from legal_moves and call play_move. It's initial position, typical opening move. Any move is fine. Choose e2e4 (king pawn two squares). That's a standard opening.\n\nWe will call play_move with move \"e2e4\"."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to pick a legal move. It's initial position. Choose a standard opening move. Any from list. Let's play e2e4."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to play a move as White from starting position. Choose any legal move. Let's pick e2e4 (common). Need to call play_move tool with move \"e2e4\"."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to make a move as White from initial position. Choose any legal move. Probably a central pawn e2e4 is good. Need to call play_move tool."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to choose a move from legal_moves and call play_move. At start of game, typical move is e2e4 or d2d4. Let's pick e2e4. Use tool."
+      }
+    ],
+    [
+      {
+        "role": "system",
+        "content": "You are playing White in a chess game against a deterministic Black bot.\n\nUse the `play_move` tool for every move. Pass exactly one UCI move listed in the\nlatest `legal_moves` field, then inspect the returned board before choosing the\nnext move. Uppercase pieces are White; lowercase pieces are Black; `.` is an\nempty square. The server applies Black's reply automatically, so never submit a\nmove for Black and never assume what Black played. Promotion moves include a\npiece suffix, for example `e7e8q`.\n\nContinue until the returned state says `game_over: true`. While the game is\nactive, make a tool call instead of merely describing a move in text."
+      },
+      {
+        "role": "user",
+        "content": "Play this game as White. Choose one move from legal_moves and call play_move.\n\n<chess_state>\nstatus: Your turn\nturn: white\nin_check: False\ngame_over: False\nfen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\nhuman_move: (none)\nengine_move: (none)\nboard:\n    a b c d e f g h\n8 | r n b q k b n r | 8\n7 | p p p p p p p p | 7\n6 | . . . . . . . . | 6\n5 | . . . . . . . . | 5\n4 | . . . . . . . . | 4\n3 | . . . . . . . . | 3\n2 | P P P P P P P P | 2\n1 | R N B Q K B N R | 1\n    a b c d e f g h\nrecent_history: (none)\nlegal_moves: a2a3 a2a4 b1a3 b1c3 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 f2f3 f2f4 g1f3 g1h3 g2g3 g2g4 h2h3 h2h4\n</chess_state>"
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to choose a move from legal_moves and call play_move. It's initial position, typical opening move. Any move is fine. Choose e2e4 (king pawn two squares). That's a standard opening.\n\nWe will call play_move with move \"e2e4\"."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to pick a legal move. It's initial position. Choose a standard opening move. Any from list. Let's play e2e4."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to play a move as White from starting position. Choose any legal move. Let's pick e2e4 (common). Need to call play_move tool with move \"e2e4\"."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to make a move as White from initial position. Choose any legal move. Probably a central pawn e2e4 is good. Need to call play_move tool."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to choose a move from legal_moves and call play_move. At start of game, typical move is e2e4 or d2d4. Let's pick e2e4. Use tool."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to play a move as White from starting position. Choose any legal move. Let's pick e2e4. Use play_move tool."
+      }
+    ],
+    [
+      {
+        "role": "system",
+        "content": "You are playing White in a chess game against a deterministic Black bot.\n\nUse the `play_move` tool for every move. Pass exactly one UCI move listed in the\nlatest `legal_moves` field, then inspect the returned board before choosing the\nnext move. Uppercase pieces are White; lowercase pieces are Black; `.` is an\nempty square. The server applies Black's reply automatically, so never submit a\nmove for Black and never assume what Black played. Promotion moves include a\npiece suffix, for example `e7e8q`.\n\nContinue until the returned state says `game_over: true`. While the game is\nactive, make a tool call instead of merely describing a move in text."
+      },
+      {
+        "role": "user",
+        "content": "Play this game as White. Choose one move from legal_moves and call play_move.\n\n<chess_state>\nstatus: Your turn\nturn: white\nin_check: False\ngame_over: False\nfen: rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\nhuman_move: (none)\nengine_move: (none)\nboard:\n    a b c d e f g h\n8 | r n b q k b n r | 8\n7 | p p p p p p p p | 7\n6 | . . . . . . . . | 6\n5 | . . . . . . . . | 5\n4 | . . . . . . . . | 4\n3 | . . . . . . . . | 3\n2 | P P P P P P P P | 2\n1 | R N B Q K B N R | 1\n    a b c d e f g h\nrecent_history: (none)\nlegal_moves: a2a3 a2a4 b1a3 b1c3 b2b3 b2b4 c2c3 c2c4 d2d3 d2d4 e2e3 e2e4 f2f3 f2f4 g1f3 g1h3 g2g3 g2g4 h2h3 h2h4\n</chess_state>"
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to choose a move from legal_moves and call play_move. It's initial position, typical opening move. Any move is fine. Choose e2e4 (king pawn two squares). That's a standard opening.\n\nWe will call play_move with move \"e2e4\"."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to pick a legal move. It's initial position. Choose a standard opening move. Any from list. Let's play e2e4."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to play a move as White from starting position. Choose any legal move. Let's pick e2e4 (common). Need to call play_move tool with move \"e2e4\"."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to make a move as White from initial position. Choose any legal move. Probably a central pawn e2e4 is good. Need to call play_move tool."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to choose a move from legal_moves and call play_move. At start of game, typical move is e2e4 or d2d4. Let's pick e2e4. Use tool."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to play a move as White from starting position. Choose any legal move. Let's pick e2e4. Use play_move tool."
+      },
+      {
+        "role": "assistant",
+        "reasoning_content": "We need to play a move as White from the initial position. Legal moves listed. Choose any. Let's pick e2e4 typical. Call play_move with move \"e2e4\"."
+      }
+    ]
+  ],
+  "responses": [
+    {
+      "id": "resp_01a081ff-d98e-7ef9-87e8-ad554def9439",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": null,
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null,
+            "reasoning_content": "We need to choose a move from legal_moves and call play_move. It's initial position, typical opening move. Any move is fine. Choose e2e4 (king pawn two squares). That's a standard opening.\n\nWe will call play_move with move \"e2e4\"."
+          }
+        }
+      ],
+      "created": 1788887423,
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": null,
+      "usage": {
+        "completion_tokens": 61,
+        "prompt_tokens": 687,
+        "total_tokens": 748,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 60,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 236
+        }
+      },
+      "status": "completed"
+    },
+    {
+      "id": "resp_01a081ff-dc9b-7161-a1b7-fde693fefd13",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": null,
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null,
+            "reasoning_content": "We need to pick a legal move. It's initial position. Choose a standard opening move. Any from list. Let's play e2e4."
+          }
+        }
+      ],
+      "created": 1788887424,
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": null,
+      "usage": {
+        "completion_tokens": 34,
+        "prompt_tokens": 691,
+        "total_tokens": 725,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 33,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 236
+        }
+      },
+      "status": "completed"
+    },
+    {
+      "id": "resp_01a081ff-df44-7c3e-82b5-e9a753f3fcb4",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": null,
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null,
+            "reasoning_content": "We need to play a move as White from starting position. Choose any legal move. Let's pick e2e4 (common). Need to call play_move tool with move \"e2e4\"."
+          }
+        }
+      ],
+      "created": 1788887424,
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": null,
+      "usage": {
+        "completion_tokens": 45,
+        "prompt_tokens": 697,
+        "total_tokens": 742,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 44,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 236
+        }
+      },
+      "status": "completed"
+    },
+    {
+      "id": "resp_01a081ff-e20d-731d-b888-5cff87cbc6eb",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": null,
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null,
+            "reasoning_content": "We need to make a move as White from initial position. Choose any legal move. Probably a central pawn e2e4 is good. Need to call play_move tool."
+          }
+        }
+      ],
+      "created": 1788887425,
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": null,
+      "usage": {
+        "completion_tokens": 40,
+        "prompt_tokens": 703,
+        "total_tokens": 743,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 39,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 236
+        }
+      },
+      "status": "completed"
+    },
+    {
+      "id": "resp_01a081ff-e4d8-7206-ac63-338ca50c6223",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": null,
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null,
+            "reasoning_content": "We need to choose a move from legal_moves and call play_move. At start of game, typical move is e2e4 or d2d4. Let's pick e2e4. Use tool."
+          }
+        }
+      ],
+      "created": 1788887426,
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": null,
+      "usage": {
+        "completion_tokens": 47,
+        "prompt_tokens": 709,
+        "total_tokens": 756,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 46,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 236
+        }
+      },
+      "status": "completed"
+    },
+    {
+      "id": "resp_01a081ff-e798-742b-8e26-7168e7b2f345",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": null,
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null,
+            "reasoning_content": "We need to play a move as White from starting position. Choose any legal move. Let's pick e2e4. Use play_move tool."
+          }
+        }
+      ],
+      "created": 1788887426,
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": null,
+      "usage": {
+        "completion_tokens": 34,
+        "prompt_tokens": 715,
+        "total_tokens": 749,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 33,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 236
+        }
+      },
+      "status": "completed"
+    },
+    {
+      "id": "resp_01a081ff-eaba-7161-873b-01373e877435",
+      "choices": [
+        {
+          "finish_reason": "stop",
+          "index": 0,
+          "logprobs": null,
+          "message": {
+            "content": null,
+            "refusal": null,
+            "role": "assistant",
+            "annotations": null,
+            "audio": null,
+            "function_call": null,
+            "tool_calls": null,
+            "reasoning_content": "We need to play a move as White from the initial position. Legal moves listed. Choose any. Let's pick e2e4 typical. Call play_move with move \"e2e4\"."
+          }
+        }
+      ],
+      "created": 1788887427,
+      "model": "openai/gpt-oss-120b",
+      "object": "chat.completion",
+      "moderation": null,
+      "service_tier": null,
+      "system_fingerprint": null,
+      "usage": {
+        "completion_tokens": 44,
+        "prompt_tokens": 721,
+        "total_tokens": 765,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 43,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cache_write_tokens": null,
+          "cached_tokens": 236
+        }
+      },
+      "status": "completed"
+    }
+  ],
+  "compactions": []
+}

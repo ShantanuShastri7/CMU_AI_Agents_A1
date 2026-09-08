@@ -286,13 +286,17 @@ class Agent:
             flush=True,
         )
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                tools=self.tools,
-                reasoning_effort="medium",
-                max_completion_tokens=4096,
-            )
+            kwargs = {
+                "model": self.model,
+                "messages": messages,
+                "reasoning_effort": "medium",
+                "max_completion_tokens": 4096,
+            }
+            if self.tools:
+                kwargs["tools"] = self.tools
+                kwargs["tool_choice"] = "required"
+            
+            response = self.client.chat.completions.create(**kwargs)
         except Exception as exc:
             print(
                 f"[agent] step {step_number}: model request failed after retries "
