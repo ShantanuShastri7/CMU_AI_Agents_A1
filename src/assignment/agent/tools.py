@@ -178,5 +178,23 @@ SIMULATE_MOVE_TOOL = {
     },
 }
 
-# TODO()
-RUN_PYTHON_TOOL: dict = {}
+# TODO(3.4)
+RUN_PYTHON_TOOL: dict = {
+    "type": "function",
+    "function": {
+        "name": "run_python",
+        "description": "Run a Python snippet in the sandbox environment.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "description": "The python code to execute.",
+                }
+            },
+            "required": ["code"],
+            "additionalProperties": False,
+        },
+        "strict": True,
+    },
+}

@@ -13,6 +13,7 @@ from assignment.agent.base import (
     Agent,
 )
 from assignment.agent.chess_tools import (
+    _run_python,
     _game_state,
     _invoke_skill,
     _play_move,
@@ -107,7 +108,7 @@ class ChessAgent(Agent):
         )
 
         # TODO(Part 3): Register the play_move tool schema from tools.py.
-        self.tools = [PLAY_MOVE_TOOL, SIMULATE_MOVE_TOOL]
+        self.tools = [PLAY_MOVE_TOOL]
 
         if programmatic_tools:
             self.tools.append(RUN_PYTHON_TOOL)
@@ -138,12 +139,13 @@ class ChessAgent(Agent):
         if programmatic_tools:
             self.system_prompt += "\n\n" + PROGRAMMATIC_CHESS_PROMPT
         if self.skills:
-            catalog = "\n".join(skill["metadata"] for skill in self.skills.values())
+            catalog = "\\n".join(skill["metadata"] for skill in self.skills.values())
             self.system_prompt += (
-                "\n\nReusable skills are available. Call `invoke_skill` with a "
+                "\\n\\nReusable skills are available. Call `invoke_skill` with a "
                 "skill's name to load its instructions, and follow them in place "
-                f"of your default approach.\n\n<skills>\n{catalog}\n</skills>\n"
+                f"of your default approach.\\n\\n<skills>\\n{catalog}\\n</skills>\\n"
             )
+            self.tools.append(INVOKE_SKILL_TOOL)
         opening_instruction = (
             "Choose one move from legal_moves and call play_move."
             if include_legal_moves
@@ -163,18 +165,6 @@ class ChessAgent(Agent):
         self, tool_calls: list[dict[str, Any]]
     ) -> list[dict[str, str]]:
         """Execute model-generated ``play_move`` calls against the chess API."""
-
-        # TODO(Part 3.1):
-        # 1. Dispatch on the function name, and ignore a tool this agent did
-        #    not register.
-        # 2. Hand the raw arguments to the matching chess_tools helper, with
-        #    self.chess_client as its first argument. Each helper takes the
-        #    client explicitly so the same code can run inside the sandbox.
-        # 3. Format a played move with self.format_state, then update
-        #    last_state and finished.
-        # 4. Link every observation to its call with tool_call_id.
-        # 5. Turn malformed, unknown, rejected, or extra parallel calls into
-        #    recoverable <chess_error> observations instead of crashing.
 
         results = []
         for tool_call in tool_calls:
@@ -203,10 +193,36 @@ class ChessAgent(Agent):
                         "tool_call_id": tool_call["id"],
                         "content": f"<chess_error>{e}</chess_error>",
                     })
-            elif tool_call["function"]["name"] == "simulate_move":
+            elif tool_call["function"]["name"] == "run_python":
                 args = tool_call["function"]["arguments"]
                 try:
-                    response_str = _simulate_move(self.chess_client, args)
+                    response_str = _run_python(self.environment, self.python_sandbox_port, args)
+                    if response_str.startswith("<chess_error>"):
+                        results.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call["id"],
+                            "content": response_str,
+                        })
+                    else:
+                        new_state = _game_state(self.chess_client)
+                        self.last_state = new_state
+                        self.finished = bool(new_state.get("game_over"))
+                        results.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call["id"],
+                            "content": response_str + "\n\n" + self.format_state(new_state),
+                        })
+                except Exception as e:
+                    results.append({
+                        "role": "tool",
+                        "tool_call_id": tool_call["id"],
+                        "content": f"<chess_error>{e}</chess_error>",
+                    })
+
+            elif tool_call["function"]["name"] == "invoke_skill":
+                args = tool_call["function"]["arguments"]
+                try:
+                    response_str = _invoke_skill(self.skills, args)
                     results.append({
                         "role": "tool",
                         "tool_call_id": tool_call["id"],
@@ -219,6 +235,4 @@ class ChessAgent(Agent):
                         "content": f"<chess_error>{e}</chess_error>",
                     })
 
-        # TODO(Part 3.3-4): add cases for simulate_move and run_python, with
-        # linked observations and recoverable errors, just like the old tool.
         return results

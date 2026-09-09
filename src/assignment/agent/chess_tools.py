@@ -124,39 +124,54 @@ def _play_move(client: httpx.Client, arguments: str) -> str:
 
 
 def _run_python(env: Any, port: int, arguments: str) -> str:
-    """New tool: run Python with access to the existing registered tools.
+    """New tool: run Python with access to the existing registered tools."""
+    try:
+        try:
+            parsed = json.loads(arguments)
+        except ValueError as exc:
+            return f"<chess_error>Invalid JSON in arguments: {exc}</chess_error>"
 
-    The snippet runs inside the sandbox, which already has the tool
-    implementations and the chess server, so code the model wrote never
-    executes in the agent process.
-    """
-    # TODO(3.4): parse the arguments and run the code in the
-    # sandbox with the registered tools available by name.
-    #
-    # `/opt/assignment/sandbox_python.py` is a script on the `env` sandbox
-    # that has access to the same tool definitions in this file. Use it to run
-    # the code that the model produced as an argument to the run_python tool.
-    # The script accepts two positional arguments -- `port` and a base64-encoded
-    # string of code (to prevent issues with quoting). Implement this tool
-    # call.
-    #
-    # The script prints one JSON object with `stdout`, `stderr`, and `error`
-    # from running the code -- return that string as it is.
-    #
-    # A non-zero returncode means the sandbox itself failed, not the model's
-    # code. Report `exception_info` or `stderr` as a <chess_error>.
-    #
-    # Return <chess_error>{message}</chess_error> if there are issues like type
-    # mismatches or parsing failures.
-    raise NotImplementedError
+        if not isinstance(parsed, dict):
+            return "<chess_error>Arguments must be a JSON object.</chess_error>"
+
+        code = parsed.get("code")
+        if not isinstance(code, str):
+            return "<chess_error>Missing or invalid code argument.</chess_error>"
+
+        encoded = base64.b64encode(code.encode("utf-8")).decode("utf-8")
+        
+        result = env.execute(f"python /opt/assignment/sandbox_python.py {port} {encoded}")
+        
+        if result["returncode"] != 0:
+            error_msg = result.get("exception_info") or result.get("stderr") or "Unknown error"
+            return f"<chess_error>{error_msg}</chess_error>"
+
+        return result["stdout"]
+    except Exception as exc:
+        return f"<chess_error>Runtime error in run_python: {exc}</chess_error>"
 
 
 def _invoke_skill(skills: dict[str, dict[str, str]], arguments: str) -> str:
     """Existing tool: load one skill's instructions into the conversation."""
-    # TODO(3.5): parse the arguments and return the named skill's content.
-    # Return <chess_error>{message}</chess_error> if there are issues like type
-    # mismatches or parsing failures.
-    raise NotImplementedError
+    try:
+        try:
+            parsed = json.loads(arguments)
+        except ValueError as exc:
+            return f"<chess_error>Invalid JSON in arguments: {exc}</chess_error>"
+        
+        if not isinstance(parsed, dict):
+            return "<chess_error>Arguments must be a JSON object.</chess_error>"
+        
+        skill_name = parsed.get("skill_name")
+        if not isinstance(skill_name, str):
+            return "<chess_error>Missing or invalid skill_name argument.</chess_error>"
+            
+        if skill_name not in skills:
+            return f"<chess_error>Skill '{skill_name}' not found.</chess_error>"
+            
+        return skills[skill_name]["content"]
+    except Exception as exc:
+        return f"<chess_error>Runtime error in invoke_skill: {exc}</chess_error>"
 
 
 def _game_state(client: httpx.Client, reset: bool = False) -> dict:
