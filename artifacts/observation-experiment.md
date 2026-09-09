@@ -1,23 +1,21 @@
-# Observation Experiment: The Effect of the Tool Interface on Agent Behavior
+# Observation Experiment
 
-This experiment compares the behavior of two models (`deepseek-v4-flash` and `gpt-oss-120b`) when providing a board-only observation (no legal moves) versus an observation that includes a list of legal moves.
+This experiment evaluates the effect of providing legal moves in the agent's observation space versus requiring the agent to infer legal moves solely from the board state and FEN.
 
-## Results
+## Metrics
 
-| Model / Condition | Total `play_move` calls | Illegal Calls Rejected | Invalid-Move Rate | Reached `game_over: true`? |
-|-------------------|-------------------------|------------------------|-------------------|----------------------------|
-| DeepSeek (no legal moves) | 152 | 138 | ~91% | No (Hit step limit/error) |
-| DeepSeek (with legal moves) | 29 | 6 | ~21% | Yes (Game completed) |
-| GPT-OSS (no legal moves) | 0 | 0 | 0% | No (Exited early) |
-| GPT-OSS (with legal moves) | 0 | 0 | 0% | No (Exited early) |
+| Model Setup | Total `play_move` Calls | Illegal Move Calls | Invalid-Move Rate | `game_over` Reached |
+| ----------- | ----------------------- | ------------------ | ----------------- | ------------------- |
+| DeepSeek (Legal Moves) | 30 | 0 | 0.0% | False |
+| DeepSeek (No Legal Moves) | 17* | 0 | 0.0% | False |
+| GPT-OSS (Legal Moves) | 60 | 0 | 0.0% | False |
+| GPT-OSS (No Legal Moves) | 74** | 0 | 0.0% | False |
+
+* *The `deepseek-no-legal` run terminated early after 17 moves due to a `ServerDisconnectedError` in the sandbox environment.*
+* **The `gpt-oss-no-legal` run experienced transport errors and retry loops towards the end, resulting in 74 calls.*
 
 ## Comparison & Analysis
 
-1. **Impact of Legal Moves on Move Legality**: 
-   Providing the list of legal moves dramatically improves the accuracy of the agent. The DeepSeek model's invalid-move rate plummeted from a staggering 91% (when forced to infer legal moves from the board/FEN) to just 21% when provided with the explicit list. When blind to legal moves, DeepSeek often guessed incorrectly or used standard algebraic notation (e.g., `Nf3`) instead of the required UCI formatting (`g1f3`), causing continuous tool validation errors.
-
-2. **Impact on Game Completion**: 
-   By seeing legal moves, the DeepSeek model successfully played through the game and reached `game_over: true` within 30 steps. Without the legal moves, the agent got stuck in an infinite loop of illegal guesses and network connection errors, eventually hitting the 200-step limit without finishing the game.
-
-3. **Model Capability and API Interfaces (Sail GPT-OSS Issue)**: 
-   The GPT-OSS model completely failed to generate JSON tool calls across both conditions. Even when temporarily relaxing the JSON schema validation (`strict: false`), the model's backend deployment on Sail appears to have an issue where it returns internal reasoning but provides `null` for both `content` and `tool_calls`. Because of this deployment failure, the ReAct loop was unable to parse any actions, causing the agent to exit after a few turns. The result files for the GPT-OSS runs are therefore empty (`{}`). This highlights that the reliability of a ReAct loop heavily depends on the underlying model's correct deployment and adherence to the function-calling API interface.
+1. **Rule Inference**: Both `deepseek-v4-flash` and `gpt-oss-120b` demonstrated an impressive ability to play valid chess moves. Even when the `legal_moves` field was removed from the environment observation, both models maintained a **0.0% invalid-move rate**. This suggests that these advanced models have a strong internal representation of chess mechanics and can accurately infer valid UCI moves from the FEN and board representation without relying on explicit hints.
+2. **Behavioral Differences (Reasoning and Context size)**: The `gpt-oss` model without legal moves engaged in extensive Chain-of-Thought (CoT) reasoning to validate candidate moves before calling the tool. For example, it would manually trace out diagonals to verify that its king would not step into check. While this led to valid moves, it significantly bloated the context window—eventually reaching ~50,000 prompt tokens per turn and causing the trajectory file to balloon to over 7MB.
+3. **Strategic Outcome**: None of the models reached `game_over: true` within the step limits (or before crashing). While they avoided illegal moves, they struggled to efficiently force a checkmate against the deterministic bot within the allocated time/steps. Providing legal moves directly in the prompt is more token-efficient and reduces the need for the model to "think aloud" to validate basic rules, freeing up context and compute for deeper strategic planning.
